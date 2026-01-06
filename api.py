@@ -3,6 +3,7 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import predictor
+import os
 
 app = FastAPI(title="InfraSense Severity API", version="1.0")
 
@@ -39,4 +40,5 @@ async def predict_severity(
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=8890)
+    port = int(os.environ.get("PORT", 8890))
+    uvicorn.run(app, host="0.0.0.0", port=port)

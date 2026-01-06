@@ -41,40 +41,61 @@ export const requireAuth = ClerkExpressRequireAuth({
 });
 
 // Middleware to check if user is government/admin
+// export const requireGovRole = async (req, res, next) => {
+//     try {
+//         const { userId } = req.auth;
+        
+//         if (!userId) {
+//             return res.status(401).json({ error: 'Unauthenticated' });
+//         }
+
+//         // FIXED: Correct path to Clerk public metadata
+//         // In Clerk, publicMetadata is at: req.auth.sessionClaims.publicMetadata
+//         const publicMetadata = req.auth.sessionClaims?.publicMetadata || {};
+//         const userRole = publicMetadata.role || 'citizen'; // DEFAULT TO CITIZEN, NOT USER
+        
+//         console.log(`🔐 Role Check - User: ${userId}, Role: ${userRole}`); // Debug log
+//         console.log("🔍 sessionClaims:", JSON.stringify(req.auth.sessionClaims, null, 2));
+
+//         // Check if user has government role
+//         if (userRole !== 'government') {
+//             console.log(`❌ Access Denied - User ${userId} attempted government action with role: ${userRole}`);
+//             return res.status(403).json({ 
+//                 error: 'Forbidden: This action requires government authorization',
+//                 userRole: userRole // Send back for debugging
+//             });
+//         }
+
+//         console.log(`✅ Access Granted - User ${userId} has role: ${userRole}`);
+        
+//         // Attach role to request for downstream use
+//         req.userRole = userRole;
+//         next();
+//     } catch (error) {
+//         console.error('Role check error:', error);
+//         res.status(500).json({ error: 'Internal server error during authorization' });
+//     }
+// };
+
+
 export const requireGovRole = async (req, res, next) => {
-    try {
-        const { userId } = req.auth;
-        
-        if (!userId) {
-            return res.status(401).json({ error: 'Unauthenticated' });
-        }
+//   console.log(
+//     "🔍 FULL sessionClaims:",
+//     JSON.stringify(req.auth?.sessionClaims, null, 2)
+//   );
 
-        // FIXED: Correct path to Clerk public metadata
-        // In Clerk, publicMetadata is at: req.auth.sessionClaims.publicMetadata
-        const publicMetadata = req.auth.sessionClaims?.publicMetadata || {};
-        const userRole = publicMetadata.role || 'citizen'; // DEFAULT TO CITIZEN, NOT USER
-        
-        console.log(`🔐 Role Check - User: ${userId}, Role: ${userRole}`); // Debug log
-        
-        // Check if user has government role
-        if (userRole !== 'government' && userRole !== 'admin') {
-            console.log(`❌ Access Denied - User ${userId} attempted government action with role: ${userRole}`);
-            return res.status(403).json({ 
-                error: 'Forbidden: This action requires government authorization',
-                userRole: userRole // Send back for debugging
-            });
-        }
+  const publicMetadata = req.auth.sessionClaims?.publicMetadata || {};
+  const userRole = publicMetadata.role || 'citizen';
 
-        console.log(`✅ Access Granted - User ${userId} has role: ${userRole}`);
-        
-        // Attach role to request for downstream use
-        req.userRole = userRole;
-        next();
-    } catch (error) {
-        console.error('Role check error:', error);
-        res.status(500).json({ error: 'Internal server error during authorization' });
-    }
+  console.log(`🔐 Role Check - Role: ${userRole}`);
+
+  if (userRole !== 'government') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  next();
 };
+
 
 // Middleware to sync user (placeholder for future use)
 export const syncUser = async (req, res, next) => {

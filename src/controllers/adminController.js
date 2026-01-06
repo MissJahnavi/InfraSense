@@ -30,6 +30,10 @@ export const getAllIssuesForAdmin = async (req, res) => {
             id: doc.id, 
             ...doc.data() 
         }));
+        console.log(
+            "📋 Issues for admin:",
+            JSON.stringify(issues, null, 2)
+        );
 
         res.json(issues);
     } catch (error) {
@@ -66,6 +70,7 @@ export const getAdminStats = async (req, res) => {
             }
         };
 
+        console.log('📊 Admin Stats:', stats);
         res.json(stats);
     } catch (error) {
         console.error('Error fetching admin stats:', error);

@@ -33,8 +33,11 @@ const GovernmentDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
+      // const token = await getToken();
+      const token = await getToken({ template: "default" });
 
+      const payload = JSON.parse(atob(token.split(".")[1]));
+  
       // Fetch stats
       const statsRes = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: { Authorization: `Bearer ${token}` },

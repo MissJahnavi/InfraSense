@@ -11,20 +11,32 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // CORS Configuration
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:5174',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:3000'
-  ],
+// const corsOptions = {
+//   origin: [
+//     'http://localhost:5173',
+//     'http://localhost:3000',
+//     'http://localhost:5174',
+//     'http://127.0.0.1:5173',
+//     'http://127.0.0.1:3000'
+//   ],
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// };
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (Postman, curl, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // Allow all origins dynamically
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-};
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/images', express.static('images'));
@@ -43,10 +55,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
-    console.log(`✅ API available at http://localhost:${PORT}/api`);
-    console.log(`✅ Admin API at http://localhost:${PORT}/api/admin`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server is running on port ${PORT}`);
 });
 
 export default app;

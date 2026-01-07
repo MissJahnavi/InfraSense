@@ -30,45 +30,89 @@ const GovernmentDashboard = () => {
     fetchData();
   }, [statusFilter, severityFilter, sortOrder]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      // const token = await getToken();
-      const token = await getToken({ template: "default" });
+  // const fetchData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     // const token = await getToken();
+  //     const token = await getToken({ template: "default" });
 
-      const payload = JSON.parse(atob(token.split(".")[1]));
+  //     const payload = JSON.parse(atob(token.split(".")[1]));
   
-      // Fetch stats
-      const statsRes = await fetch(`${API_BASE_URL}/admin/stats`, {
+  //     // Fetch stats
+  //     const statsRes = await fetch(`${API_BASE_URL}/admin/stats`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     const statsData = await statsRes.json();
+  //     setStats(statsData);
+
+  //     // Fetch issues with filters
+  //     const params = new URLSearchParams();
+  //     if (statusFilter !== "all") params.append("status", statusFilter);
+  //     if (severityFilter !== "all") params.append("severity", severityFilter);
+  //     params.append("sortBy", "createdAt");
+  //     params.append("order", sortOrder);
+
+  //     const issuesRes = await fetch(`${API_BASE_URL}/admin/issues?${params}`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     const issuesData = await issuesRes.json();
+  //     setIssues(Array.isArray(issuesData.issues) ? issuesData.issues : []);
+
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error("Error fetching government dashboard data:", error);
+  //     setLoading(false);
+  //   }
+  // };
+
+  const fetchData = async () => {
+  try {
+    setLoading(true);
+    const token = await getToken({ template: "default" });
+
+    // -------- Stats (FILTERED) --------
+    const statsParams = new URLSearchParams();
+    if (statusFilter !== "all") statsParams.append("status", statusFilter);
+    if (severityFilter !== "all") statsParams.append("severity", severityFilter);
+
+    const statsRes = await fetch(
+      `${API_BASE_URL}/admin/stats?${statsParams}`,
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      const statsData = await statsRes.json();
-      setStats(statsData);
+      }
+    );
+    const statsData = await statsRes.json();
+    setStats(statsData);
 
-      // Fetch issues with filters
-      const params = new URLSearchParams();
-      if (statusFilter !== "all") params.append("status", statusFilter);
-      if (severityFilter !== "all") params.append("severity", severityFilter);
-      params.append("sortBy", "createdAt");
-      params.append("order", sortOrder);
+    // -------- Issues (FILTERED) --------
+    const issueParams = new URLSearchParams();
+    if (statusFilter !== "all") issueParams.append("status", statusFilter);
+    if (severityFilter !== "all") issueParams.append("severity", severityFilter);
+    issueParams.append("sortBy", "createdAt");
+    issueParams.append("order", sortOrder);
 
-      const issuesRes = await fetch(`${API_BASE_URL}/admin/issues?${params}`, {
+    const issuesRes = await fetch(
+      `${API_BASE_URL}/admin/issues?${issueParams}`,
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      const issuesData = await issuesRes.json();
-      setIssues(Array.isArray(issuesData.issues) ? issuesData.issues : []);
+      }
+    );
+    const issuesData = await issuesRes.json();
+    setIssues(Array.isArray(issuesData) ? issuesData : []);
 
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching government dashboard data:", error);
-      setLoading(false);
-    }
-  };
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching government dashboard data:", error);
+    setLoading(false);
+  }
+};
+
 
   const handleStatusUpdate = async (issueId, newStatus) => {
     try {
       setUpdating(issueId);
       const token = await getToken();
+      console.log("Updating issue:", issueId, "to status:", newStatus);
 
       const response = await fetch(
         `${API_BASE_URL}/admin/issues/${issueId}/status`,

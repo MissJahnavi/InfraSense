@@ -1,23 +1,3 @@
-// import express from 'express';
-// import { createIssue, getIssues, updateIssueStatus } from '../controllers/issuesController.js';
-// import { requireAuth } from '../middlewares/auth.js';
-// import upload from '../middlewares/upload.js';
-
-// const router = express.Router();
-
-// // Public routes (or basic auth)
-// router.get('/', getIssues);
-
-// // Protected routes
-// router.post('/', requireAuth, upload.single('image'), createIssue);
-// router.patch('/:id/status', requireAuth, updateIssueStatus);
-
-// export default router;
-
-
-
-
-
 import express from 'express';
 import { createIssue, getIssues, updateIssueStatus, getIssueById } from '../controllers/issuesController.js';
 import { requireAuth, requireGovRole } from '../middlewares/auth.js';
